@@ -67,7 +67,7 @@
 
   const { createMessage } = useMessage();
   const isUpdate = ref(false);
-  const currentId = ref<number>();
+  const currentId = ref<string | number>();
 
   const [registerTable, { reload }] = useTable({
     api: listStorage,
@@ -122,22 +122,22 @@
 
   async function handleToggle(record: FileStorage) {
     if (record.status === 1) {
-      await disableStorage(record.id!);
+      await disableStorage(record.id!, record.storageCode);
       createMessage.success('已关闭');
     } else {
-      await enableStorage(record.id!);
+      await enableStorage(record.id!, record.storageCode);
       createMessage.success('已启用（其它存储已关闭）');
     }
     reload();
   }
 
   async function handleTest(record: FileStorage) {
-    await testStorage(record.id!);
+    await testStorage(record.id!, record.storageCode);
     createMessage.success('连通性正常');
   }
 
   async function handleDelete(record: FileStorage) {
-    await deleteStorage(record.id!);
+    await deleteStorage(record.id!, record.storageCode);
     createMessage.success('已删除');
     reload();
   }

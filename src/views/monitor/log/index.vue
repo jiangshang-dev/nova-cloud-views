@@ -88,7 +88,13 @@
     useSearchForm: true,
     showTableSetting: true,
     bordered: true,
-    actionColumn: { width: 100, title: '操作', dataIndex: 'action' },
+    actionColumn: {
+      width: 100,
+      title: '操作',
+      dataIndex: 'action',
+      fixed: 'right',
+      slots: { customRender: 'action' },
+    },
     fetchSetting: {
       pageField: 'current',
       sizeField: 'size',

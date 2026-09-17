@@ -18,7 +18,7 @@ enum Api {
 export type StorageType = 'local' | 'minio' | 'rustfs' | 'oss' | 's3';
 
 export interface FileStorage {
-  id?: number;
+  id?: string | number;
   storageCode: string;
   storageName: string;
   storageType: StorageType;
@@ -37,7 +37,7 @@ export interface FileStorage {
 
 export interface UploadInitResult {
   skipUpload: boolean;
-  fileId?: number;
+  fileId?: string | number;
   accessUrl?: string;
   uploadId?: string;
   objectKey?: string;
@@ -47,7 +47,7 @@ export interface UploadInitResult {
 }
 
 export interface FileInfo {
-  id: number;
+  id: string | number;
   fileName: string;
   fileSuffix?: string;
   contentType?: string;
@@ -61,32 +61,38 @@ export interface FileInfo {
 
 export const listStorage = () => defHttp.get<FileStorage[]>({ url: Api.StorageList });
 
-export const createStorage = (data: FileStorage) => defHttp.post<number>({ url: Api.Storage, data });
+export const createStorage = (data: FileStorage) =>
+  defHttp.post<string | number>({ url: Api.Storage, data });
 
-export const updateStorage = (id: number, data: FileStorage) =>
+export const updateStorage = (id: string | number, data: FileStorage) =>
   defHttp.put({ url: `${Api.Storage}/${id}`, data });
 
-export const deleteStorage = (id: number) => defHttp.delete({ url: `${Api.Storage}/${id}` });
+export const deleteStorage = (id: string | number, storageCode?: string) =>
+  defHttp.delete({ url: `${Api.Storage}/${id}`, params: { storageCode } });
 
-export const enableStorage = (id: number) => defHttp.post({ url: `${Api.Storage}/${id}/enable` });
+export const enableStorage = (id: string | number, storageCode?: string) =>
+  defHttp.post({ url: `${Api.Storage}/${id}/enable`, params: { storageCode } });
 
-export const disableStorage = (id: number) => defHttp.post({ url: `${Api.Storage}/${id}/disable` });
+export const disableStorage = (id: string | number, storageCode?: string) =>
+  defHttp.post({ url: `${Api.Storage}/${id}/disable`, params: { storageCode } });
 
-export const testStorage = (id: number) => defHttp.post({ url: `${Api.Storage}/${id}/test` });
+export const testStorage = (id: string | number, storageCode?: string) =>
+  defHttp.post({ url: `${Api.Storage}/${id}/test`, params: { storageCode } });
 
 export const initUpload = (data: Recordable) =>
   defHttp.post<UploadInitResult>({ url: Api.UploadInit, data });
 
-export const uploadChunk = (data: FormData, onUploadProgress?: (e: ProgressEvent) => void) =>
-  defHttp.post(
+export const uploadChunk = (data: FormData, onUploadProgress?: (e: ProgressEvent) => void) => {
+  // 仅走 multipart 表单字段，勿把 uploadId 放 query（S3 ID 含 +/ 易被错误解码）
+  return defHttp.post(
     {
       url: Api.UploadChunk,
       data,
-      headers: { 'Content-Type': 'multipart/form-data' },
       onUploadProgress,
     },
     { isTransformResponse: true }
   );
+};
 
 export const mergeUpload = (uploadId: string) =>
   defHttp.post<FileInfo>({ url: Api.UploadMerge, data: { uploadId } });
@@ -104,4 +110,4 @@ export const simpleUpload = (params: { file: File; bizType?: string; bizId?: str
 export const pageFileInfo = (params: { pageNo?: number; pageSize?: number; fileName?: string }) =>
   defHttp.get({ url: Api.InfoPage, params });
 
-export const deleteFileInfo = (id: number) => defHttp.delete({ url: `${Api.Info}/${id}` });
+export const deleteFileInfo = (id: string | number) => defHttp.delete({ url: `${Api.Info}/${id}` });

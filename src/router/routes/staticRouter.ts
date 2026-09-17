@@ -1,20 +1,24 @@
 import type { AppRouteRecordRaw } from '/@/router/types';
 import { LAYOUT } from '/@/router/constant';
 
+/**
+ * AI 助手独立路径，避免与动态菜单「AI平台」父路由 /ai 冲突。
+ */
 export const AI_ROUTE: AppRouteRecordRaw = {
   path: '',
-  name: 'ai-parent',
+  name: 'ai-assistant-parent',
   component: LAYOUT,
   meta: {
-    title: 'ai',
+    title: 'ai-assistant',
   },
   children: [
     {
-      path: '/ai',
-      name: 'ai',
+      path: '/ai-assistant',
+      name: 'ai-assistant',
       component: () => import('/@/views/dashboard/ai/index.vue'),
       meta: {
         title: 'AI助手',
+        hideMenu: true,
       },
     },
   ],

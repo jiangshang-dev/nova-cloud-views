@@ -55,7 +55,7 @@ export async function chunkUpload(options: ChunkUploadOptions): Promise<FileInfo
     chunkSize = DEFAULT_CHUNK_SIZE,
     bizType,
     bizId,
-    concurrency = 3,
+    concurrency = 1,
     onProgress,
     onStatus,
   } = options;
@@ -63,6 +63,7 @@ export async function chunkUpload(options: ChunkUploadOptions): Promise<FileInfo
   onStatus?.('计算文件指纹…');
   const fileMd5 = await calcFileMd5(file, chunkSize);
 
+  // 历史失败会话可能残留 size=0 的分片，续传会跳过真实上传；换文件或清掉上传中记录更稳
   onStatus?.('初始化上传…');
   const init: UploadInitResult = await initUpload({
     fileName: file.name,
@@ -73,6 +74,10 @@ export async function chunkUpload(options: ChunkUploadOptions): Promise<FileInfo
     bizType,
     bizId,
   });
+
+  if (!init.skipUpload && !init.uploadId) {
+    throw new Error('初始化上传失败：未返回 uploadId');
+  }
 
   if (init.skipUpload) {
     onProgress?.(100, 1, 1);
@@ -88,8 +93,11 @@ export async function chunkUpload(options: ChunkUploadOptions): Promise<FileInfo
   }
 
   const uploaded = new Set(init.uploadedChunks || []);
-  const total = init.chunkTotal;
-  const size = init.chunkSize || chunkSize;
+  const total = Number(init.chunkTotal);
+  const size = Number(init.chunkSize || chunkSize);
+  if (!total || !size) {
+    throw new Error('初始化上传失败：分片参数无效');
+  }
   let done = uploaded.size;
   onProgress?.(Math.floor((done / total) * 100), done, total);
   onStatus?.(`上传分片 ${done}/${total}`);

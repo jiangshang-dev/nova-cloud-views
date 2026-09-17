@@ -117,7 +117,11 @@ const transform: AxiosTransform = {
     
     const params = config.params || {};
     const data = config.data || false;
-    formatDate && data && !isString(data) && formatRequestDate(data);
+    const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
+    // FormData 不能走 formatRequestDate / Object.keys 分支，否则会被当成空对象并丢掉文件字段
+    if (!isFormData) {
+      formatDate && data && !isString(data) && formatRequestDate(data);
+    }
     if (config.method?.toUpperCase() === RequestEnum.GET) {
       if (!isString(params)) {
         // 给 get 请求加上时间戳参数，避免从缓存中拿数据。
@@ -130,7 +134,10 @@ const transform: AxiosTransform = {
     } else {
       if (!isString(params)) {
         formatDate && formatRequestDate(params);
-        if (Reflect.has(config, 'data') && config.data && Object.keys(config.data).length > 0) {
+        if (isFormData) {
+          config.data = data;
+          config.params = params;
+        } else if (Reflect.has(config, 'data') && config.data && Object.keys(config.data).length > 0) {
           config.data = data;
           config.params = params;
         } else {
@@ -139,7 +146,7 @@ const transform: AxiosTransform = {
           config.params = undefined;
         }
         if (joinParamsToUrl) {
-          config.url = setObjToUrlParams(config.url as string, Object.assign({}, config.params, config.data));
+          config.url = setObjToUrlParams(config.url as string, Object.assign({}, config.params, isFormData ? {} : config.data));
         }
       } else {
         // 兼容restful风格
@@ -168,8 +175,19 @@ const transform: AxiosTransform = {
     
     // 将签名和时间戳，添加在请求接口 Header
     config.headers[ConfigEnum.TIMESTAMP] = signMd5Utils.getTimestamp();
-    config.headers[ConfigEnum.Sign] = signMd5Utils.getSign(config.url, cloneDeep(config.params), cloneDeep(config.data));
-    
+    const signData =
+      typeof FormData !== 'undefined' && config.data instanceof FormData ? undefined : config.data;
+    config.headers[ConfigEnum.Sign] = signMd5Utils.getSign(
+      config.url,
+      cloneDeep(config.params),
+      signData === undefined ? undefined : cloneDeep(signData)
+    );
+
+    // FormData 必须由浏览器自动设置 multipart boundary
+    if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
+      delete config.headers['content-type'];
+    }
     config.headers[ConfigEnum.VERSION] = 'v3';
     if (token && (config as Recordable)?.requestOptions?.withToken !== false) {
       // jwt token

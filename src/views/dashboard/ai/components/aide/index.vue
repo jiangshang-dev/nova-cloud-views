@@ -48,7 +48,7 @@
     setAuthCache(AIDE_FLAG, getToken());
   };
   const handleGo = (params) => {
-    router.push({ path: '/ai' });
+    router.push({ path: '/ai-assistant' });
   };
 </script>
 

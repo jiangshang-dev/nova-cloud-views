@@ -201,7 +201,17 @@ export class VAxios {
   }
 
   request<T = any>(config: AxiosRequestConfig, options?: RequestOptions): Promise<T> {
+    // lodash cloneDeep 会把 FormData 克隆成空对象，导致分片上传丢失 uploadId/file
+    const rawData = config?.data;
+    const isFormData = typeof FormData !== 'undefined' && rawData instanceof FormData;
     let conf: CreateAxiosOptions = cloneDeep(config);
+    if (isFormData) {
+      conf.data = rawData;
+      conf.headers = conf.headers || {};
+      // 交给浏览器自动带 boundary
+      delete (conf.headers as any)['Content-Type'];
+      delete (conf.headers as any)['content-type'];
+    }
     const transform = this.getTransform();
 
     const { requestOptions } = this.options;
