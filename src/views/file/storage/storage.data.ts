@@ -7,7 +7,7 @@ export const columns: BasicColumn[] = [
   { title: 'Endpoint', dataIndex: 'endpoint', width: 220 },
   { title: 'Bucket', dataIndex: 'bucketName', width: 140 },
   { title: '状态', dataIndex: 'status', key: 'status', width: 90 },
-  { title: '备注', dataIndex: 'remark' },
+  { title: '备注', dataIndex: 'remark', width: 160 },
 ];
 
 export const formSchemas: FormSchema[] = [

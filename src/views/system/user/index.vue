@@ -26,6 +26,8 @@
     title: '用户管理',
     api: novaUserPage,
     rowKey: 'id',
+    canResize: true,
+    showIndexColumn: true,
     columns: [
       { title: '账号', dataIndex: 'username', width: 120 },
       { title: '昵称', dataIndex: 'nickname', width: 120 },

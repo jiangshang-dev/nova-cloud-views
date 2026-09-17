@@ -42,12 +42,9 @@ function handleChildren(children: BasicColumn[] | undefined, ellipsis: boolean) 
 function handleIndexColumn(propsRef: ComputedRef<BasicTableProps>, getPaginationRef: ComputedRef<boolean | PaginationProps>, columns: BasicColumn[]) {
   const { t } = useI18n();
 
-  const { showIndexColumn, indexColumnProps, isTreeTable } = unref(propsRef);
+  const { showIndexColumn, indexColumnProps } = unref(propsRef);
 
   let pushIndexColumns = false;
-  if (unref(isTreeTable)) {
-    return;
-  }
   columns.forEach(() => {
     const indIndex = columns.findIndex((column) => column.flag === INDEX_COLUMN_FLAG);
     if (showIndexColumn) {
@@ -65,12 +62,16 @@ function handleIndexColumn(propsRef: ComputedRef<BasicTableProps>, getPagination
   }
   if (!pushIndexColumns) return;
 
-  const isFixedLeft = columns.some((item) => item.fixed === 'left');
+  const indexWidth = propsRef.value.isTreeTable
+    ? propsRef.value.size === 'large'
+      ? 90
+      : 80
+    : propsRef.value.size === 'large'
+      ? 65
+      : 60;
 
   columns.unshift({
     flag: INDEX_COLUMN_FLAG,
-    // 代码逻辑说明: 【TV360X-1634】密度是宽松模式时，序号列表头换行了
-    width: propsRef.value.size === 'large' ? 65 : 50,
     title: t('component.table.index'),
     align: 'center',
     customRender: ({ index }) => {
@@ -81,12 +82,10 @@ function handleIndexColumn(propsRef: ComputedRef<BasicTableProps>, getPagination
       const { current = 1, pageSize = PAGE_SIZE } = getPagination;
       return ((current < 1 ? 1 : current) - 1) * pageSize + index + 1;
     },
-    ...(isFixedLeft
-      ? {
-          fixed: 'left',
-        }
-      : {}),
     ...indexColumnProps,
+    // 树表首列含展开图标，需更宽，避免序号与图标竖排
+    width: indexColumnProps?.width ?? indexWidth,
+    fixed: 'left',
   });
 }
 

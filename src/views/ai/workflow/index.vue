@@ -28,6 +28,8 @@
     title: '工作流管理',
     api: novaAiWorkflowPage,
     rowKey: 'id',
+    canResize: true,
+    showIndexColumn: true,
     columns: [
       { title: '编码', dataIndex: 'workflowCode', width: 140 },
       { title: '名称', dataIndex: 'workflowName', width: 160 },

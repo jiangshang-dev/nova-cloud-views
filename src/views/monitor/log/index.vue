@@ -77,6 +77,8 @@
     title: '日志',
     api: (params) => (activeKey.value === 'oper' ? novaOperLogPage(params) : novaLoginLogPage(params)),
     rowKey: 'id',
+    canResize: true,
+    showIndexColumn: true,
     columns: operColumns,
     formConfig: {
       schemas: [

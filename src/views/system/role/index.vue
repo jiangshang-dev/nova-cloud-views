@@ -40,6 +40,8 @@
     title: '角色管理',
     api: novaRolePage,
     rowKey: 'id',
+    canResize: true,
+    showIndexColumn: true,
     columns: [
       { title: '角色名称', dataIndex: 'roleName', width: 140 },
       { title: '角色编码', dataIndex: 'roleCode', width: 140 },

@@ -48,6 +48,8 @@
     api: novaAiProviderList,
     rowKey: 'id',
     pagination: false,
+    canResize: true,
+    showIndexColumn: true,
     columns: [
       { title: '编码', dataIndex: 'providerCode', width: 140 },
       { title: '名称', dataIndex: 'providerName', width: 160 },
@@ -67,6 +69,7 @@
       width: 140,
       title: '操作',
       dataIndex: 'action',
+      fixed: 'right',
       slots: { customRender: 'action' },
     },
   });
@@ -75,6 +78,8 @@
     api: novaAiModelList,
     rowKey: 'id',
     pagination: false,
+    canResize: true,
+    showIndexColumn: true,
     columns: [
       { title: '模型编码', dataIndex: 'modelCode', width: 160 },
       { title: '模型名称', dataIndex: 'modelName', width: 160 },
@@ -103,6 +108,7 @@
       width: 140,
       title: '操作',
       dataIndex: 'action',
+      fixed: 'right',
       slots: { customRender: 'action' },
     },
   });

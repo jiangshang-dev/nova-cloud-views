@@ -26,6 +26,8 @@
     title: 'Agent 管理',
     api: novaAiAgentPage,
     rowKey: 'id',
+    canResize: true,
+    showIndexColumn: true,
     columns: [
       { title: '编码', dataIndex: 'agentCode', width: 140 },
       { title: '名称', dataIndex: 'agentName', width: 160 },

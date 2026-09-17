@@ -77,7 +77,16 @@
     useSearchForm: false,
     showTableSetting: true,
     bordered: true,
-    actionColumn: { width: 220, title: '操作', dataIndex: 'action', key: 'action' },
+    canResize: true,
+    showIndexColumn: true,
+    scroll: { x: 1200 },
+    actionColumn: {
+      width: 220,
+      title: '操作',
+      dataIndex: 'action',
+      key: 'action',
+      fixed: 'right',
+    },
   });
 
   const [registerModal, { openModal, closeModal }] = useModal();

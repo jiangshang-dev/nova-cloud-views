@@ -35,6 +35,8 @@
     title: '字典管理',
     api: novaDictTypePage,
     rowKey: 'id',
+    canResize: true,
+    showIndexColumn: true,
     columns: [
       { title: '字典名称', dataIndex: 'dictName', width: 160 },
       { title: '字典编码', dataIndex: 'dictType', width: 180 },

@@ -59,7 +59,6 @@ export function useTableScroll(
 
   async function calcTableHeight() {
     const { resizeHeightOffset, pagination, maxHeight, minHeight } = unref(propsRef);
-    const tableData = unref(getDataSourceRef);
 
     const table = unref(tableElRef);
     if (!table) return;
@@ -90,7 +89,7 @@ export function useTableScroll(
 
     bodyEl!.style.height = 'unset';
 
-    if (!unref(getCanResize) || ( !tableData || tableData.length === 0)) return;
+    if (!unref(getCanResize)) return;
 
     await nextTick();
     //Add a delay to get the correct bottomIncludeBody paginationHeight footerHeight headerHeight
@@ -150,35 +149,14 @@ export function useTableScroll(
     height = (height > maxHeight! ? (maxHeight as number) : height) ?? height;
     setHeight(height);
 
-    bodyEl!.style.height = `${height}px`;
-    // update-begin--author:liaozhiyang---date:20240609---for【issues/8374】分页始终显示在底部
+    // 固定铺满底部：统一作用在 .ant-table-body，避免改 tbody 导致树表高度跳动
     nextTick(() => {
-      if (maxHeight === undefined) {
-        if (unref(getPaginationInfo) && unref(getDataSourceRef).length) {
-          const pageSize = unref(getPaginationInfo)?.pageSize;
-          const current = unref(getPaginationInfo)?.current;
-          const total = unref(getPaginationInfo)?.total;
-          const tableBody = tableEl.querySelector('.ant-table-body') as HTMLElement;
-          const tr = tableEl.querySelector('.ant-table-tbody')?.children ?? [];
-          const lastrEl = tr[tr.length - 1] as HTMLElement;
-          const trHeight = lastrEl.offsetHeight;
-          const dataHeight = trHeight * pageSize;
-          if (tableBody && lastrEl) {
-            // table是否隐藏（隐藏的table不能吸底）
-            const isTableBodyHide = tableBody.offsetHeight == 0 && tableBody.offsetWidth == 0;
-            if (isTableBodyHide) {
-              return;
-            }
-            if (current === 1 && pageSize > unref(getDataSourceRef).length && total <= pageSize) {
-              tableBody.style.height = `${height}px`;
-            } else {
-              tableBody.style.height = `${dataHeight < height ? dataHeight : height}px`;
-            }
-          }
-        }
+      const tableBody = tableEl.querySelector('.ant-table-body') as HTMLElement;
+      if (tableBody) {
+        tableBody.style.height = `${height}px`;
+        tableBody.style.maxHeight = `${height}px`;
       }
     });
-    // update-end--author:liaozhiyang---date:20240609---for【issues/8374】分页始终显示在底部
   }
   useWindowSizeFn(calcTableHeight, 280);
   onMountedOrActivated(() => {
@@ -222,12 +200,12 @@ export function useTableScroll(
     const tableHeight = unref(tableHeightRef);
     const { canResize, scroll } = unref(propsRef);
     const { table } = componentSetting;
+    // 先合并业务传入的 scroll，再强制保留自适应高度 y，避免仅传 x 时高度丢失/跳动
     return {
-      x: unref(getScrollX),
-      y: canResize ? tableHeight : null,
-      // 代码逻辑说明: 【issues/1188】BasicTable加上scrollToFirstRowOnChange类型定义
       scrollToFirstRowOnChange: table.scrollToFirstRowOnChange,
-      ...scroll,
+      ...(scroll || {}),
+      x: scroll?.x ?? unref(getScrollX),
+      y: canResize ? tableHeight : scroll?.y ?? null,
     };
   });
 

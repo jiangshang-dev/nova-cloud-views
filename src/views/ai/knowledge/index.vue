@@ -26,6 +26,8 @@
     title: '知识库管理',
     api: novaAiKnowledgePage,
     rowKey: 'id',
+    canResize: true,
+    showIndexColumn: true,
     columns: [
       { title: '编码', dataIndex: 'kbCode', width: 140 },
       { title: '名称', dataIndex: 'kbName', width: 160 },

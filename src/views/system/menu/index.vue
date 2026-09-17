@@ -25,6 +25,14 @@
   const { createMessage } = useMessage();
   const [registerModal, { openModal }] = useModal();
 
+  const ACTION_COLUMN = {
+    width: 260,
+    title: '操作',
+    dataIndex: 'action',
+    fixed: 'right' as const,
+    slots: { customRender: 'action' },
+  };
+
   const [registerTable, { reload }] = useTable({
     title: '菜单管理',
     api: async () => (await novaMenuTree()) || [],
@@ -32,6 +40,9 @@
     pagination: false,
     isTreeTable: true,
     defaultExpandAllRows: true,
+    canResize: true,
+    showIndexColumn: true,
+    scroll: { x: 1500 },
     columns: [
       { title: '菜单名称', dataIndex: 'menuName', width: 220, align: 'left' },
       {
@@ -40,7 +51,7 @@
         width: 90,
         customRender: ({ text }) => ({ M: '目录', C: '菜单', F: '按钮' }[text] || text),
       },
-      { title: '路由', dataIndex: 'path', width: 140 },
+      { title: '路由', dataIndex: 'path', width: 160 },
       { title: '组件', dataIndex: 'component', width: 200 },
       { title: '权限标识', dataIndex: 'permission', width: 180 },
       { title: '图标', dataIndex: 'icon', width: 160 },
@@ -61,18 +72,11 @@
     useSearchForm: false,
     showTableSetting: true,
     bordered: true,
-    actionColumn: {
-      width: 260,
-      title: '操作',
-      dataIndex: 'action',
-      fixed: 'right',
-      slots: { customRender: 'action' },
-    },
+    actionColumn: ACTION_COLUMN,
   });
 
   function getActions(record): ActionItem[] {
     const actions: ActionItem[] = [];
-    // 目录/菜单可新增下级；按钮不再新增下级
     if (record.menuType !== 'F') {
       actions.push({
         label: '新增下级',

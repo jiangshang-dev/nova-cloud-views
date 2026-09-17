@@ -297,8 +297,11 @@ export function useListTable(tableProps: TableProps): [
     clickToRowSelect: false,
     // 是否显示边框
     bordered: true,
-    // 是否显示序号列
-    showIndexColumn: false,
+    // 是否显示序号列（默认显示并固定左侧）
+    showIndexColumn: true,
+    indexColumnProps: {
+      fixed: 'left',
+    },
     // 显示表格设置
     showTableSetting: true,
     // 表格全屏设置

@@ -23,6 +23,14 @@
   const { createMessage } = useMessage();
   const [registerModal, { openModal }] = useModal();
 
+  const ACTION_COLUMN = {
+    width: 240,
+    title: '操作',
+    dataIndex: 'action',
+    fixed: 'right' as const,
+    slots: { customRender: 'action' },
+  };
+
   const [registerTable, { reload }] = useTable({
     title: '部门管理',
     api: async (params) => (await novaDeptTree(params)) || [],
@@ -30,6 +38,9 @@
     pagination: false,
     isTreeTable: true,
     defaultExpandAllRows: true,
+    canResize: true,
+    showIndexColumn: true,
+    scroll: { x: 1300 },
     columns: [
       { title: '部门名称', dataIndex: 'deptName', width: 220, align: 'left' },
       { title: '部门编码', dataIndex: 'deptCode', width: 140 },
@@ -42,7 +53,7 @@
         width: 80,
         customRender: ({ text }) => (text === 1 ? '正常' : '停用'),
       },
-      { title: '备注', dataIndex: 'remark' },
+      { title: '备注', dataIndex: 'remark', width: 160 },
     ],
     formConfig: {
       schemas: [{ field: 'deptName', label: '部门名称', component: 'Input', colProps: { span: 6 } }],
@@ -50,13 +61,7 @@
     useSearchForm: true,
     showTableSetting: true,
     bordered: true,
-    actionColumn: {
-      width: 240,
-      title: '操作',
-      dataIndex: 'action',
-      fixed: 'right',
-      slots: { customRender: 'action' },
-    },
+    actionColumn: ACTION_COLUMN,
   });
 
   function getActions(record): ActionItem[] {

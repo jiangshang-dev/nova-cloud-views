@@ -41,13 +41,21 @@
     useSearchForm: true,
     showTableSetting: true,
     bordered: true,
+    canResize: true,
+    showIndexColumn: true,
     fetchSetting: {
       pageField: 'pageNo',
       sizeField: 'pageSize',
       listField: 'records',
       totalField: 'total',
     },
-    actionColumn: { width: 100, title: '操作', dataIndex: 'action', key: 'action' },
+    actionColumn: {
+      width: 100,
+      title: '操作',
+      dataIndex: 'action',
+      key: 'action',
+      fixed: 'right',
+    },
   });
 
   async function handleDelete(record: FileInfo) {
